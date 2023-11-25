@@ -1,8 +1,8 @@
 select count(*) from restaurantes;
 -- 30 restaurantes cadastrados
 
--- objetivo: excluir o restaurante 9 e verificar as tabelas com FK de restaurante se os dados foram excluídos juntos (cascade)
-
+-- objetivo: banir o restaurante 9 por má conduta e suspeita de alteração das avaliações
+-- excluir o restaurante e verificar as tabelas com FK de restaurante se os dados foram excluídos juntos (cascade)
 
 
 select * from reservas order by restaurantes_id;
@@ -24,18 +24,23 @@ select restaurantes_id, count(*) from restaurantes_funcionarios group by restaur
 -- ao excluir o restuarante 9, sobrará 637 registros
 
 select count(*) from avaliacoes;
---76 registros
+--313 registros
 select * from avaliacoes where restaurantes_id = '9';
--- total de 3 registros de mesa no restaurante 9.
--- ao excluir o restaurante 9, o cascade fará com que sobre 73 registros
+-- total de 17 registros de mesa no restaurante 9.
+-- ao excluir o restaurante 9, o cascade fará com que sobre 296 registros
 
-delete from restaurantes where id = 9;
+
+select count(*) from telefones;
+-- 1000 registros
+select * from telefones where restaurantes_id = '9';
+-- total de 11 telefones registrados para este restaurante
+-- ao excluir o restaurante, sobrará 989
+
+select count(*) from enderecos;
+-- 114 registros
+select * from enderecos where restaurantes_id = '9';
+-- um unico registro de endereço para o restaurante ( id 39)
+
+
+--delete from restaurantes where id = 9;
 select * from restaurantes
-
-
-select * from avaliacoes order by restaurantes_id, nota
-
-
---nesse ponto eu ganhei justa causa porque selecionei a linha 32 sem a parte do where achando que era um select. 4 tabelas com FK em cascade
--- inserindo dados novamente pelos inserts salvos
-truncate restaurantes restart identity cascade
