@@ -18,10 +18,11 @@ CREATE TABLE IF NOT EXISTS public.enderecos
     cidade VARCHAR(256) NOT NULL,
     bairro VARCHAR(256) NOT NULL,
     estado character(256) NOT NULL,
-    clientes_id INT NOT NULL UNIQUE,
-    restaurantes_id INT NOT NULL UNIQUE,
-    funcionarios_id INT NOT NULL UNIQUE
+    clientes_id INT UNIQUE,
+    restaurantes_id INT UNIQUE,
+    funcionarios_id INT UNIQUE
 );
+
 
 CREATE TABLE IF NOT EXISTS public.restaurantes
 (
@@ -87,7 +88,7 @@ CREATE TABLE IF NOT EXISTS public.funcionarios
 );
 
 ALTER TABLE funcionarios ADD COLUMN data_registro timestamp NOT NULL;
-SELECT * FROM funcionarios
+--SELECT * FROM funcionarios
 CREATE TABLE IF NOT EXISTS public.restaurantes_funcionarios
 (
     id SERIAL PRIMARY KEY,

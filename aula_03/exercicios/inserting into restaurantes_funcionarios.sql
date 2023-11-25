@@ -1,6 +1,6 @@
-select * from restaurantes_funcionarios
-TRUNCATE TABLE restaurantes_funcionarios
-RESTART IDENTITY;
+-- select * from restaurantes_funcionarios
+-- TRUNCATE TABLE restaurantes_funcionarios
+-- RESTART IDENTITY;
 
 insert into restaurantes_funcionarios (restaurantes_id, funcionarios_id, turno, id_funcoes) values (16, 21, 'Tarde', 21) ON CONFLICT DO NOTHING;
 insert into restaurantes_funcionarios (restaurantes_id, funcionarios_id, turno, id_funcoes) values (15, 11, 'Manhã', 37) ON CONFLICT DO NOTHING;
