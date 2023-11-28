@@ -66,12 +66,50 @@ from sales group by product order by 2 desc LIMIT 1
 
 
 --3) 
+SELECT * FROM employees;
+SELECT * FROM projects;
+SELECT * FROM departments;
 
 --a) Selecione o nome e cargo de cada funcionário, juntamente com o departamento em que trabalham.
+SELECT e.name "Funcionário", e.role "Cargo", d.name "Departamento"
+from employees e
+LEFT JOIN departments d on (e.department_id = d.id);
 
 
+--b) Selecione o nome, o cargo e o salário dos funcionários do departamento de vendas.
+SELECT DISTINCT e.name "Funcionário", e.role "Cargo", e.salary "Salário" --distinct pois existem dois id's para Vendas
+from employees e
+INNER JOIN departments d on (e.department_id = d.id)
+WHERE d.name = 'Vendas';
 
 
+--c) Selecione o nome, o cargo e o salário dos funcionários cujo salário
+--   seja maior que 3500 e que trabalham no departamento de vendas.
+SELECT DISTINCT e.name "Funcionário", e.role "Cargo", e.salary "Salário" --distinct pois existem dois id's para Vendas
+from employees e
+INNER JOIN departments d on (e.department_id = d.id)
+WHERE d.name = 'Vendas' and e.salary::numeric > 3500; -- ninguém de vendas ganha mais que $3.500
 
+
+--d) Selecione o nome, o cargo, o salário e o nome do projeto associado a cada funcionário.
+SELECT e.name "Funcionário", e.role "Cargo", e.salary "Salário", p.name "Projeto"
+from employees e
+INNER JOIN departments d on (e.department_id = d.id)
+LEFT JOIN projects p on (e.department_id = p.id) order by 1; -- alguns cargos estão com IDs repetidas
+
+--e) Liste o total gasto pela empresa no pagamento dos funcionários.
+SELECT SUM(salary::numeric)::money "Salário total" from employees;
+
+--f) Liste o total de salário pago para os funcionários de cada departamento.
+SELECT d.name "Departamento", sum(e.salary::numeric)::money "Salário por departamento"
+from employees e
+INNER JOIN departments d on (e.department_id = d.id)
+GROUP BY d.name; -- agrupamento feito pelo nome pois existem IDs repetidos
+
+--g) Liste o maior salário de cada departamento.
+SELECT d.name "Departamento", max(e.salary::numeric)::money "Salário por departamento"
+from employees e
+INNER JOIN departments d on (e.department_id = d.id)
+GROUP BY d.name; 
 
 
