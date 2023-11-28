@@ -8,7 +8,7 @@ SELECT title "Livros" from books where author = 'Henry Davis';
 
 -- c) Selecione o título, autor e ano dos livros publicados antes de 1900.
 SELECT title "Livros", author "Autor", release_year "Ano de publicação"
-from books where release_year < 1900
+from books where release_year < 1900;
 
 --d) Selecione todos os livros cujo título comece com a letra "O".
 SELECT title "Livros" from books where title ILIKE 'O%';
@@ -58,10 +58,10 @@ SELECT product "Produto", sum((price::numeric)*quantity_in_stock)::money from sa
 --f) Selecione a quantidade de produtos que possuem estoque menor que 20.
 SELECT COUNT(*) "Produtos com estoque < 20" from sales where quantity_in_stock < 20;
 
---f) Selecione o produto com o maior retorno após a venda de todas as unidades em estoque.
+--g) Selecione o produto com o maior retorno após a venda de todas as unidades em estoque.
 
 select product "Produto", sum((price::numeric)*quantity_in_stock)::money "Faturamento total"
-from sales group by product order by 2 desc LIMIT 1
+from sales group by product order by 2 desc LIMIT 1;
 
 
 
@@ -96,6 +96,20 @@ SELECT e.name "Funcionário", e.role "Cargo", e.salary "Salário", p.name "Proje
 from employees e
 INNER JOIN departments d on (e.department_id = d.id)
 LEFT JOIN projects p on (e.department_id = p.id) order by 1; -- alguns cargos estão com IDs repetidas
+	--d) RESOLUÇÃO DO PROFESSOR
+	select
+		e.name nome,
+		e.role cargo,
+		e.salary salario,
+		STRING_AGG(p.name, ', ') projetos
+	from
+		employees e
+		inner join departments d on (e.department_id = d.id)
+		inner join projects p on (p.department_id = d.id)
+	GROUP BY e.id, 1;
+	
+	
+	
 
 --e) Liste o total gasto pela empresa no pagamento dos funcionários.
 SELECT SUM(salary::numeric)::money "Salário total" from employees;
@@ -111,5 +125,96 @@ SELECT d.name "Departamento", max(e.salary::numeric)::money "Salário por depart
 from employees e
 INNER JOIN departments d on (e.department_id = d.id)
 GROUP BY d.name; 
+
+--4.
+SELECT * FROM foods;
+SELECT * FROM categories;
+SELECT * FROM nutritional_information;
+SELECT * FROM diets;
+SELECT * FROM diets_foods;
+--a) Listar todos os alimentos e as suas respectivas categorias.
+SELECT f.name "Alimento", c.name "Categoria"
+FROM foods f INNER JOIN categories c on (c.id = f.category_id);
+
+--b) Encontre o total de calorias para cada categoria de alimento.
+SELECT c.name "Categoria", sum(n.calories) "Calorias por categoria"
+FROM categories c
+	INNER JOIN foods f on (c.id = f.category_id)
+	INNER JOIN nutritional_information n on (n.food_id =f.id)
+GROUP BY c.name order by 2 desc;
+
+--c) Listar as dietas que incluem alimentos com mais de 500 calorias.
+
+select
+diets.name "Dietas"
+from diets_foods df
+inner join diets on (diets.id = df.diet_id)
+where
+	df.food_id in (
+		SELECT
+			food_id
+		from
+			foods
+			inner join nutritional_information nf on (foods.id = nf.food_id)
+		where calories > 500);
+
+--d) Calcular a média de proteínas por categoria de alimento.
+SELECT
+	c.name "Categoria",
+	ROUND(avg(ni.proteins), 2) "Média de proteínas"
+FROM
+	categories c
+	INNER JOIN foods on (foods.category_id = c.id)
+	INNER JOIN nutritional_information ni on (ni.food_id = foods.id)
+GROUP BY c.name ORDER BY 2 DESC;
+
+--e) Identificar os alimentos que têm um teor de gordura superior à média de gordura de todos os alimentos.
+SELECT
+f.name "Alimento",
+ni.fats "Gorduras (somente >média)"
+from foods f
+inner join nutritional_information ni on (f.id = ni.food_id)
+where ni.fats > (SELECT AVG(ni.fats) FROM nutritional_information ni inner join foods f on (f.id = ni.food_id));
+
+--f) Listar as três categorias de alimentos com o maior número de itens.
+select
+c.name "Categoria",
+COUNT(*) "Total de itens"
+FROM
+	categories c
+	INNER JOIN foods f on (f.category_id = c.id)
+GROUP BY c.name order by 2 desc limit 3;
+
+--g) Encontrar a dieta que tem o menor teor total de carboidratos.
+select
+	--diet_id,
+	diets.name "Dieta"
+	,sum(carbohydrates) "Carboidratos"
+FROM
+	diets_foods df
+	inner join foods on (df.food_id = foods.id)
+	inner join nutritional_information ni on (ni.food_id = foods.id)
+	inner join diets on (diets.id = df.diet_id)
+GROUP BY diet_id, diets.name order by  "Carboidratos" limit 1
+
+
+--h) Listar todos os alimentos que não estão incluídos em nenhuma dieta.
+SELECT
+f.name "Alimento"
+from foods f
+left join diets_foods df on (df.food_id = f.id)
+where df.food_id is null -- todos os alimentos se encontram em ao menos uma lista
+
+--i) Determinar a proporção de proteínas, carboidratos e gorduras (em percentagem) de cada alimento.
+SELECT
+f.name "Alimento",
+round(ni.proteins/(ni.proteins + ni.carbohydrates + ni.fats),2) "% Proteína",
+round(ni.carbohydrates/(ni.proteins + ni.carbohydrates + ni.fats),2) "% Carboidratos",
+round(ni.fats/(ni.proteins + ni.carbohydrates + ni.fats),2) "% Gordura"
+from foods f
+inner join nutritional_information ni on (f.id = ni.food_id)
+
+
+
 
 
